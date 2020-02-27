@@ -1,0 +1,57 @@
+from partition_monitor import PartitionMonitor
+from flask import Flask
+from flask import render_template
+from flask import request
+from flask import jsonify
+from flask_cors import CORS
+import logging
+from apscheduler.schedulers.background import BackgroundScheduler
+
+import time 
+application = Flask(__name__)
+cors = CORS(application, resources={r"/*": {"origins": "*"}})
+logging.basicConfig()
+
+@application.route('/')
+def index():
+
+  Monitor = PartitionMonitor()
+  return jsonify(Monitor.get_data())
+
+@application.route('/history')
+def history():
+
+  cols = list()
+  args = dict()
+
+  if len(request.args):
+
+      args = request.args.to_dict()
+
+      if 'cols' in args:
+        args.pop('cols')
+
+  if request.args.get('cols'):
+
+    cols = request.args.get('cols')
+
+
+  Monitor = PartitionMonitor()
+  return jsonify(Monitor.get_history(cols,args))
+
+@application.route('/update_db')
+
+def update_db():
+  
+  with application.app_context():
+
+    Monitor = PartitionMonitor()
+    Monitor.update_db()
+
+if __name__ == '__main__':
+
+  scheduler = BackgroundScheduler()
+  scheduler.add_job(update_db, 'interval', minutes=1,max_instances=1)
+  scheduler.start()
+
+  application.run(host='localhost', port=5000, debug=True)

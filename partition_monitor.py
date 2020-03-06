@@ -17,7 +17,7 @@ class PartitionMonitor():
 
         self.PARTITIONS = list()
 
-        child = subprocess.Popen("df -B 1M", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        child = subprocess.Popen("df -B 1M", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,encoding='utf8')
         pipe,err = child.communicate()
                
         if err:
@@ -55,6 +55,9 @@ class PartitionMonitor():
         utils = Utils()
 
         requirements = utils.parse_requirements(**args)
+        requirements_sql = requirements.replace('&', ' ' + 'AND' + ' ')
+
+        sql = ''
 
         if cols:
             cols = cols
@@ -63,12 +66,11 @@ class PartitionMonitor():
 
         if requirements:
 
-            sql = 'select {} from partition_monitor where {} ORDER BY date desc'.format(cols,requirements)
+            sql = 'select {} from partition_monitor where {} ORDER BY date desc'.format(cols,requirements_sql)
     
         else:
 
             sql = 'select {} from partition_monitor ORDER BY date desc'.format(cols)
-
 
         cur = get_db().cursor()
         query = query_dict(sql)

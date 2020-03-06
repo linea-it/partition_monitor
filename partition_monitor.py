@@ -86,5 +86,5 @@ class PartitionMonitor():
             query_insert('INSERT OR REPLACE INTO partition_monitor (server,description,filesystem,size,use,available,usepercent,mountpoint,date) \
             VALUES (?,?,?,?,?,?,?,?,?)', \
             (server['server'],server['description'],server['filesystem'],server['size'],server['use'],server['available'],server['usepercent'], \
-            server['mountpoint'],datetime.now().strftime("%d-%m-%Y %H:%M:%S")))
+            server['mountpoint'],datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 

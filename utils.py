@@ -27,7 +27,9 @@ class Utils():
                         requirements.append(requirement + '<=' + value)
                     elif condition in 'range':
                         if len(value.split(',')) == 2:
-                            requirements.append(requirement + ' ' + 'BETWEEN' + ' ' + self.parse_value(value.split(',')[0]) + ' ' + 'AND' + ' ' + self.parse_value(value.split(',')[1]) )
+                            requirements.append(requirement + ' ' + 'BETWEEN' + ' ' \
+                            + self.parse_value(value.split(',')[0]) + ' ' + 'AND' + ' ' \
+                            + self.parse_value(value.split(',')[1]) )
                     elif condition in 'contains':
                         requirements.append(requirement + ' ' + 'like' + ' ' + '"' + '%' + eval(self.parse_value(value)) + '%' + '"')
                         
@@ -40,7 +42,6 @@ class Utils():
         config.sections()
 
         try:
-
             config.read('config.ini')
             return config
 

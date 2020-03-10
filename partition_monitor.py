@@ -50,12 +50,14 @@ class PartitionMonitor():
 
         return self.PARTITIONS
 
-    def get_history(self,cols,args):
+    def get_history(self,cols,args,limit,offset):
 
         utils = Utils()
 
         requirements = utils.parse_requirements(**args)
         requirements_sql = requirements.replace('&', ' ' + 'AND' + ' ')
+
+        print (requirements_sql)
 
         sql = ''
 
@@ -72,8 +74,20 @@ class PartitionMonitor():
 
             sql = 'select {} from partition_monitor ORDER BY date desc'.format(cols)
 
+        if limit:
+            sql += ' limit {}'.format(limit)
+
+        if limit and offset:
+            sql += ' offset {}'.format(offset)
+
+        sql_count = 'select count(*) from partition_monitor'
+
+
         cur = get_db().cursor()
-        query = query_dict(sql)
+        query = dict({
+            "data": query_dict(sql),
+            "total_count": query_one(sql_count),
+        })
 
         return query
 
@@ -83,8 +97,14 @@ class PartitionMonitor():
 
         for server in DATA:
 
-            query_insert('INSERT OR REPLACE INTO partition_monitor (server,description,filesystem,size,use,available,usepercent,mountpoint,date) \
-            VALUES (?,?,?,?,?,?,?,?,?)', \
-            (server['server'],server['description'],server['filesystem'],server['size'],server['use'],server['available'],server['usepercent'], \
-            server['mountpoint'],datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            sql = "SELECT use from partition_monitor where server=='{}' AND use=='{}'".format(server['server'],server['use'])
 
+            result = query_one(sql)
+
+            if (len(result)):
+                pass
+            else:
+                query_insert('INSERT OR REPLACE INTO partition_monitor (server,description,filesystem,size,use,available,usepercent,mountpoint,date) \
+                VALUES (?,?,?,?,?,?,?,?,?)', \
+                (server['server'],server['description'],server['filesystem'],server['size'],server['use'],server['available'],server['usepercent'], \
+                server['mountpoint'],datetime.now().strftime("%Y-%m-%d %H:%M:%S")))

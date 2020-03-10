@@ -23,6 +23,8 @@ def history():
 
   cols = list()
   args = dict()
+  limit = False
+  offset = False
 
   if len(request.args):
 
@@ -35,9 +37,16 @@ def history():
 
     cols = request.args.get('cols')
 
+  if request.args.get('limit'):
+    limit = int(request.args.get('limit'))
+    args.pop('limit')
+
+  if request.args.get('offset'):
+    offset = int(request.args.get('offset'))
+    args.pop('offset')
 
   Monitor = PartitionMonitor()
-  return jsonify(Monitor.get_history(cols,args))
+  return jsonify(Monitor.get_history(cols,args,limit,offset))
 
 @application.route('/update_db')
 

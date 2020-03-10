@@ -86,7 +86,7 @@ class PartitionMonitor():
         cur = get_db().cursor()
         query = dict({
             "data": query_dict(sql),
-            "total_count": query_one(sql_count),
+            "total_count": query_count(sql_count),
         })
 
         return query
@@ -97,11 +97,11 @@ class PartitionMonitor():
 
         for server in DATA:
 
-            sql = "SELECT use from partition_monitor where server=='{}' AND use=='{}'".format(server['server'],server['use'])
+            sql = "SELECT use from partition_monitor where server=='{}' AND use=='{}' ORDER BY date desc limit 1".format(server['server'],server['use'])
 
             result = query_one(sql)
 
-            if (len(result)):
+            if (result):
                 pass
             else:
                 query_insert('INSERT OR REPLACE INTO partition_monitor (server,description,filesystem,size,use,available,usepercent,mountpoint,date) \

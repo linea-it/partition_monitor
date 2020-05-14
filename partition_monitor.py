@@ -56,33 +56,32 @@ class PartitionMonitor():
                             'filesystem': filesystem, 'size': size,
                             'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
 
-            else:
-                child = subprocess.Popen("df -B 1M", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
-                pipe, err = child.communicate()
-                if err:
-                    print('Erro ao obter partitions')
-                    self.fail_count = self.fail_count + 1
-                    exit
-                else:
+        
+        child = subprocess.Popen("df -B 1M", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+        pipe, err = child.communicate()
+        if err:
+            print('Erro ao obter partitions')
+            self.fail_count = self.fail_count + 1
+            exit
+        else:
 
-                    output = pipe.split("\n")
+            output = pipe.split("\n")
+            for self.partition in output[1:]:
 
-                    for self.partition in output[1:]:
+                data = self.partition.split()
+                if len(data) == 6:
+                    filesystem = data[0]
+                    size = data[1]
+                    use = data[2]
+                    available = data[3]
+                    usepercent = data[4]
+                    mountpoint = data[5]
 
-                        data = self.partition.split()
-                        if len(data) == 6:
-                            filesystem = data[0]
-                            size = data[1]
-                            use = data[2]
-                            available = data[3]
-                            usepercent = data[4]
-                            mountpoint = data[5]
+                    if mountpoint in self.config.sections():
 
-                            if mountpoint in self.config.sections():
-
-                                PARTITIONS.append({'server': self.config[mountpoint]['server'], 'description': self.config[mountpoint]['Description'],
-                                'filesystem': filesystem, 'size': size,
-                                'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
+                        PARTITIONS.append({'server': self.config[mountpoint]['server'], 'description': self.config[mountpoint]['Description'],
+                        'filesystem': filesystem, 'size': size,
+                        'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
 
         return PARTITIONS
 

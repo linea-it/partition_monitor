@@ -58,3 +58,28 @@ class Utils():
             val = "\"%s\"" % value
             return val
 
+    def get_totals(self, PARTITIONS):
+
+        SERVERS = list()
+        TOTAL_SERVERS = list()
+
+        for server in PARTITIONS:
+
+            if server['server'] not in SERVERS:
+                SERVERS.append(server['server'])
+
+        for srv in SERVERS:
+
+            total_size = 0
+            total_use = 0
+
+            for part in PARTITIONS:
+
+                if srv == part['server']:
+
+                    total_size = total_size + int(part['size'])
+                    total_use = total_use + int(part['use'])
+
+            TOTAL_SERVERS.append({'server': srv, 'total_size': total_size, 'total_use': total_use})
+
+        return TOTAL_SERVERS

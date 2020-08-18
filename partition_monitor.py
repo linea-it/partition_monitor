@@ -63,7 +63,7 @@ class PartitionMonitor():
                                  'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
                 else:
                     part = section
-                    host = h
+                    host = self.config[section]['Host']
                     user = self.config[section]['User']
                     key = self.config[section]['Key']
 

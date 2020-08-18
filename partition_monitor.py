@@ -26,35 +26,72 @@ class PartitionMonitor():
 
             if 'Remote' in self.config[section] and self.config[section]['Remote'] == 'Yes':
 
-                part = section
-                host = self.config[section]['Host']
-                user = self.config[section]['User']
-                key = self.config[section]['Key']
+                host = self.config[section]['Host'].split(',')
+                if (len(host) > 1 ):
+                
+                    for h in host:      
 
-                child = subprocess.Popen('ssh {} -l {} -i {}  df {} -B 1M'.format(host, user, key, part),
+                        part = section
+                        host = h
+                        user = self.config[section]['User']
+                        key = self.config[section]['Key']
+
+                        child = subprocess.Popen('ssh -o "StrictHostKeyChecking=no" {} -l {} -i {}  df {} -B 1M'.format(host, user, key, part),
                                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
-                pipe, err = child.communicate()
+                        pipe, err = child.communicate()
 
-                if err:
-                    print('Erro ao obter partitions')
-                    self.fail_count = self.fail_count + 1
+                        if err:
+                            print('Erro ao obter partitions')
+                            print (err)
+                            self.fail_count = self.fail_count + 1
+                        else:
+                            output = pipe.split("\n")
+                            data = output[1:]
+                            data_filter = ' '.join(data)
+
+                            description = data_filter.split()
+                            if len(description) == 6:
+                                filesystem = description[0]
+                                size = description[1]
+                                use = description[2]
+                                available = description[3]
+                                usepercent = description[4]
+                                mountpoint = section
+
+                                PARTITIONS.append({'server': self.config[mountpoint]['server'], 'description': host ,
+                                 'filesystem': filesystem, 'size': size,
+                                 'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
                 else:
-                    output = pipe.split("\n")
-                    data = output[1:]
-                    data_filter = ' '.join(data)
+                    part = section
+                    host = h
+                    user = self.config[section]['User']
+                    key = self.config[section]['Key']
 
-                    description = data_filter.split()
-                    if len(description) == 6:
-                        filesystem = description[0]
-                        size = description[1]
-                        use = description[2]
-                        available = description[3]
-                        usepercent = description[4]
-                        mountpoint = section
+                    child = subprocess.Popen('ssh -o "StrictHostKeyChecking=no" {} -l {} -i {}  df {} -B 1M'.format(host, user, key, part),
+                    shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+                    pipe, err = child.communicate()
 
-                        PARTITIONS.append({'server': self.config[mountpoint]['server'], 'description': self.config[mountpoint]['Description'],
-                            'filesystem': filesystem, 'size': size,
-                            'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
+                    if err:
+                        print('Erro ao obter partitions')
+                        print (err)
+                        self.fail_count = self.fail_count + 1
+                    else:
+                        output = pipe.split("\n")
+                        data = output[1:]
+                        data_filter = ' '.join(data)
+
+                        description = data_filter.split()
+                        if len(description) == 6:
+                            filesystem = description[0]
+                            size = description[1]
+                            use = description[2]
+                            available = description[3]
+                            usepercent = description[4]
+                            mountpoint = section
+
+                            PARTITIONS.append({'server': self.config[mountpoint]['server'], 'description': self.config[mountpoint]['Description'],
+                                 'filesystem': filesystem, 'size': size,
+                                 'use': use, 'available': available, 'usepercent': usepercent, 'mountpoint': mountpoint})
 
         
         child = subprocess.Popen("df -B 1M", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')

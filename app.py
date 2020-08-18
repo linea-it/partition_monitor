@@ -98,4 +98,4 @@ if __name__ == '__main__':
   scheduler.add_job(update_db, 'interval', minutes=5,max_instances=1)
   scheduler.start()
 
-  application.run(host='localhost', port=5000, debug=True)
+  application.run(host='186.232.60.33', port=5005, debug=True)

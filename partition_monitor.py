@@ -164,14 +164,51 @@ class PartitionMonitor():
 
         return query
 
-    def get_server_history(self,cols,args,limit,offset):
+    def get_last(self,cols,args,limit,offset):
 
         utils = Utils()
 
         requirements = utils.parse_requirements(**args)
         requirements_sql = requirements.replace('&', ' ' + 'AND' + ' ')
 
-        print (requirements_sql)
+        sql = ''
+
+        if cols:
+            cols = cols
+        else:
+            cols = '*'
+
+        if requirements:
+
+            sql = 'select DISTINCT {} from partition_monitor where {} GROUP BY description'.format(cols,requirements_sql)
+    
+        else:
+
+            sql = 'select DISTINCT {} from partition_monitor GROUP BY description'.format(cols)
+
+        if limit:
+            sql += ' limit {}'.format(limit)
+
+        if limit and offset:
+            sql += ' offset {}'.format(offset)
+
+        sql_count = 'select DISTINCT count(*) from partition_monitor GROUP BY description'
+
+
+        cur = get_db().cursor()
+        query = dict({
+            "data": query_dict(sql),
+            "total_count": query_count(sql_count),
+        })
+
+        return query
+
+    def get_server_history(self,cols,args,limit,offset):
+
+        utils = Utils()
+
+        requirements = utils.parse_requirements(**args)
+        requirements_sql = requirements.replace('&', ' ' + 'AND' + ' ')
 
         sql = ''
 

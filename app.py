@@ -78,6 +78,36 @@ def server_history():
   Monitor = PartitionMonitor()
   return jsonify(Monitor.get_server_history(cols,args,limit,offset))
 
+@application.route('/last')
+def last():
+
+  cols = list()
+  args = dict()
+  limit = False
+  offset = False
+
+  if len(request.args):
+
+      args = request.args.to_dict()
+
+      if 'cols' in args:
+        args.pop('cols')
+
+  if request.args.get('cols'):
+
+    cols = request.args.get('cols')
+
+  if request.args.get('limit'):
+    limit = int(request.args.get('limit'))
+    args.pop('limit')
+
+  if request.args.get('offset'):
+    offset = int(request.args.get('offset'))
+    args.pop('offset')
+
+  Monitor = PartitionMonitor()
+  return jsonify(Monitor.get_last(cols,args,limit,offset))
+
 @application.route('/update_db')
 
 def update_db():

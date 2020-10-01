@@ -35,8 +35,12 @@ class PartitionMonitor():
                         host = h
                         user = self.config[section]['User']
                         key = self.config[section]['Key']
+                        try:
+                            port = self.config[section]['port']
+                        except:
+                            port = 22
 
-                        child = subprocess.Popen('ssh -o "StrictHostKeyChecking=no" {} -l {} -i {}  df {} -B 1M'.format(host, user, key, part),
+                        child = subprocess.Popen('ssh -o "StrictHostKeyChecking=no" {} -l {} -i {} -p {}  df {} -B 1M'.format(host, user, key,port, part),
                                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
                         pipe, err = child.communicate()
 
@@ -66,8 +70,12 @@ class PartitionMonitor():
                     host = self.config[section]['Host']
                     user = self.config[section]['User']
                     key = self.config[section]['Key']
+                    try:
+                      port = self.config[section]['Port']
+                    except:
+                      port = 22
 
-                    child = subprocess.Popen('ssh -o "StrictHostKeyChecking=no" {} -l {} -i {}  df {} -B 1M'.format(host, user, key, part),
+                    child = subprocess.Popen('ssh -o "StrictHostKeyChecking=no" {} -l {} -i {} -p {}  df {} -B 1M'.format(host, user, key,port, part),
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
                     pipe, err = child.communicate()
 

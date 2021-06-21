@@ -1,2 +1,10 @@
-/database.sql
-/config.ini
+database.sql
+database.sql
+.database.sql
+database.pyc
+database.db
+
+config.ini
+
+/__pycache__
+/.mypy_cache

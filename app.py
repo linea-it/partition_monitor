@@ -125,7 +125,7 @@ def get_response():
 if __name__ == '__main__':
 
   scheduler = BackgroundScheduler()
-  scheduler.add_job(update_db, 'interval', minutes=5,max_instances=1)
+  scheduler.add_job(update_db, 'interval', minutes=30,max_instances=1)
   scheduler.start()
 
-  application.run(host='186.232.60.33', port=5005, debug=True)
+  application.run(host='186.232.60.70', port=5152, debug=True)

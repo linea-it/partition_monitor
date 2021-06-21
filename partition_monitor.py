@@ -46,6 +46,7 @@ class PartitionMonitor():
 
                         if err:
                             print('Erro ao obter partitions')
+                            print (host)
                             print (err)
                             self.fail_count = self.fail_count + 1
                         else:
@@ -81,6 +82,7 @@ class PartitionMonitor():
 
                     if err:
                         print('Erro ao obter partitions')
+                        print(host)
                         print (err)
                         self.fail_count = self.fail_count + 1
                     else:
@@ -251,7 +253,6 @@ class PartitionMonitor():
         return query
 
     def update_db(self):
-
         DATA = self.get_data()
         TOTALS = self.utils.get_totals(DATA)
 
@@ -260,10 +261,10 @@ class PartitionMonitor():
             sql = "SELECT use from partition_monitor where server=='{}' AND use=='{}' ORDER BY date desc limit 1".format(server['server'],server['use'])
 
             result = query_one(sql)
-
             if (result):
                 pass
             else:
+                print('inserting into database')
                 query_insert('INSERT OR REPLACE INTO partition_monitor (server,description,filesystem,size,use,available,usepercent,mountpoint,date) \
                 VALUES (?,?,?,?,?,?,?,?,?)', \
                 (server['server'],server['description'],server['filesystem'],server['size'],server['use'],server['available'],server['usepercent'], \
@@ -278,8 +279,9 @@ class PartitionMonitor():
                 result = query_one(sql)
 
                 if (result):
-                    pass
+                    continue
                 else:
+                    print('Inserting into database')
                     query_insert('INSERT OR REPLACE INTO server_monitor (server,total_size,total_use,date) \
                     VALUES (?,?,?,?)', \
                     (total['server'],total['total_size'],total['total_use'],datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
